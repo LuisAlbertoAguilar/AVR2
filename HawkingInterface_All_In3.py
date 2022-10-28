@@ -35,110 +35,298 @@ class MenuPrincipal(Screen):
     pass
 
 class Diagnostico(Screen):
-
+        
     def Reset(self):
         self.diagnostico_sensor_direccion_ValueInt = '0'+'°'
         self.diagnostico_sensor_velocidad_ValueInt = '0'+' '+'km/h'
         self.diagnostico_sensor_frenos_delanteros_ValueInt = '0'+' '+'%'
         self.diagnostico_sensor_frenos_traseros_ValueInt = '0'+' '+'%'
 ################################################################################
+    def add_Diagnostico_TrenMotrizSetPoint(self):
+        currentStr = self.ids.trenSP.text
+        currentLst = currentStr.split(' '+'km/h')
+        currentNum = int(currentLst[0])
+        currentNum += 1
+        if currentNum >= 90:
+            currentNum = 90
+        self.ids.trenSP.text = str(currentNum)+' '+'km/h'
+        global arduino
+        global trenSP
+        global trenEnable
+        global trenReversa
+        global trenLimVel1
+        global trenLimVel2
+        trenSP = str(currentNum)
+        arduinoString = "84 5 " + str(trenSP) + " " + str(trenEnable) + " " + str(trenReversa) + " " + str(trenLimVel1) + " " + str(trenLimVel2) 
+        print(arduinoString)
+        arduino.write(arduinoString.encode())
+
+
+    def subs_Diagnostico_TrenMotriz_SetPoint(self):
+        currentStr = self.ids.trenSP.text
+        currentLst = currentStr.split(' '+'km/h')
+        currentNum = int(currentLst[0])
+        currentNum -= 1
+        if currentNum <= 0:
+            currentNum = 0
+        self.ids.trenSP.text = str(currentNum)+' '+'km/h'
+        global arduino
+        global trenSP
+        global trenEnable
+        global trenReversa
+        global trenLimVel1
+        global trenLimVel2
+        trenSP = str(currentNum)
+        arduinoString = "84 5 " + str(trenSP) + " " + str(trenEnable) + " " + str(trenReversa) + " " + str(trenLimVel1) + " " + str(trenLimVel2)
+        print(arduinoString)
+        arduino.write(arduinoString.encode())
+
+
     def add_Diagnostico_Direccion(self):
-        currentStr = self.ids.diagnostico_referencia_direccion.text
+        currentStr = self.ids.direccionSP.text
         currentLst = currentStr.split('°')
         currentNum = int(currentLst[0])
         currentNum += 1
         if currentNum >= 90:
             currentNum = 90
-        self.ids.diagnostico_referencia_direccion.text = str(currentNum)+'°'
-        global nuevo_diagnostico_referencia_direccion_ValueStr
-        nuevo_diagnostico_referencia_direccion_ValueStr = str(currentNum)
+        self.ids.direccionSP.text = str(currentNum)+'°'
+        global direccionSP
+        global arduino
+        direccionSP = str(currentNum)
+        arduinoString = "83 1 " + (direccionSP)
+        print(arduinoString)
+        arduino.write(arduinoString.encode())
+
 
     def subs_Diagnostico_Direccion(self):
-        currentStr = self.ids.diagnostico_referencia_direccion.text
+        currentStr = self.ids.direccionSP.text
         currentLst = currentStr.split('°')
         currentNum = int(currentLst[0])
         currentNum -= 1
         if currentNum <= -90:
             currentNum = -90
-        self.ids.diagnostico_referencia_direccion.text = str(currentNum)+'°'
-        global nuevo_diagnostico_referencia_direccion_ValueStr
-        nuevo_diagnostico_referencia_direccion_ValueStr = str(currentNum)
-################################################################################
-    def add_Diagnostico_Velocidad(self):
-        currentStr = self.ids.diagnostico_referencia_velocidad.text
-        currentLst = currentStr.split(' '+'km/h')
-        currentNum = int(currentLst[0])
-        currentNum += 1
-        if currentNum >= 90:
-            currentNum = 90
-        self.ids.diagnostico_referencia_velocidad.text = str(currentNum)+' '+'km/h'
-        global nuevo_diagnostico_referencia_velocidad_ValueStr
-        nuevo_diagnostico_referencia_velocidad_ValueStr = str(currentNum)
+        self.ids.direccionSP.text = str(currentNum)+'°'
+        global direccionSP
+        global arduino
+        direccionSP = str(currentNum)
+        arduinoString = "83 1 " + (direccionSP)
+        print(arduinoString)
+        arduino.write(arduinoString.encode())
 
-    def subs_Diagnostico_Velocidad(self):
-        currentStr = self.ids.diagnostico_referencia_velocidad.text
-        currentLst = currentStr.split(' '+'km/h')
-        currentNum = int(currentLst[0])
-        currentNum -= 1
-        if currentNum <= 0:
-            currentNum = 0
-        self.ids.diagnostico_referencia_velocidad.text = str(currentNum)+' '+'km/h'
-        global nuevo_diagnostico_referencia_velocidad_ValueStr
-        nuevo_diagnostico_referencia_velocidad_ValueStr = str(currentNum)
-################################################################################
-    def add_Diagnostico_Frenos_Delanteros(self):
-        currentStr = self.ids.diagnostico_referencia_frenos_delanteros.text
-        currentLst = currentStr.split(' '+'%')
-        currentNum = int(currentLst[0])
-        currentNum += 1
-        if currentNum >= 90:
-            currentNum = 90
-        self.ids.diagnostico_referencia_frenos_delanteros.text = str(currentNum)+' '+'%'
-        global nuevo_diagnostico_referencia_frenos_delanteros_ValueStr
-        nuevo_diagnostico_referencia_frenos_delanteros_ValueStr = str(currentNum)
 
-    def subs_Diagnostico_Frenos_Delanteros(self):
-        currentStr = self.ids.diagnostico_referencia_frenos_delanteros.text
-        currentLst = currentStr.split(' '+'%')
-        currentNum = int(currentLst[0])
-        currentNum -= 1
-        if currentNum <= 0:
-            currentNum = 0
-        self.ids.diagnostico_referencia_frenos_delanteros.text = str(currentNum)+' '+'%'
-        global nuevo_diagnostico_referencia_frenos_delanteros_ValueStr
-        nuevo_diagnostico_referencia_frenos_delanteros_ValueStr = str(currentNum)
-################################################################################
-    def add_Diagnostico_Frenos_Traseros(self):
-        currentStr = self.ids.diagnostico_referencia_frenos_traseros.text
-        currentLst = currentStr.split(' '+'%')
+    # TODO: checar límites frenos
+    def add_Diagnostico_FrenoTrasero(self):
+        currentStr = self.ids.frenoTraseroSP.text
+        currentLst = currentStr.split('%')
         currentNum = int(currentLst[0])
         currentNum += 1
-        if currentNum >= 90:
-            currentNum = 90
-        self.ids.diagnostico_referencia_frenos_traseros.text = str(currentNum)+' '+'%'
-        global nuevo_diagnostico_referencia_frenos_traseros_ValueStr
-        nuevo_diagnostico_referencia_frenos_traseros_ValueStr = str(currentNum)
-        
-    def modoconduccion(self):
-        self.driving=True
-        
-    def subs_Diagnostico_Frenos_Traseros(self):
-        currentStr = self.ids.diagnostico_referencia_frenos_traseros.text
-        currentLst = currentStr.split(' '+'%')
+        if currentNum >= 100:
+            currentNum = 100
+        self.ids.frenoTraseroSP.text = str(currentNum) + '%'
+        global frenoTraseroSP
+        global arduino
+        frenoTraseroSP = str(currentNum)
+        arduinoString = "66 1 " + (frenoTraseroSP)
+        print(arduinoString)
+        arduino.write(arduinoString.encode())
+
+
+    def subs_Diagnostico_FrenoTrasero(self):
+        currentStr = self.ids.frenoTraseroSP.text
+        currentLst = currentStr.split('%')
         currentNum = int(currentLst[0])
         currentNum -= 1
         if currentNum <= 0:
             currentNum = 0
-        self.ids.diagnostico_referencia_frenos_traseros.text = str(currentNum)+' '+'%'
-        global nuevo_diagnostico_referencia_frenos_traseros_ValueStr
-        nuevo_diagnostico_referencia_frenos_traseros_ValueStr = str(currentNum)
+        self.ids.frenoTraseroSP.text = str(currentNum) + '%'
+        global frenoTraseroSP
+        global arduino
+        frenoTraseroSP = str(currentNum)
+        arduinoString = "66 1 " + (frenoTraseroSP)
+        print(arduinoString)
+        arduino.write(arduinoString.encode())
+
+
+    def add_Diagnostico_FrenoDelantero(self):
+        currentStr = self.ids.frenoDelanteroSP.text
+        currentLst = currentStr.split('%')
+        currentNum = int(currentLst[0])
+        currentNum += 1
+        if currentNum >= 100:
+            currentNum = 100
+        self.ids.frenoDelanteroSP.text = str(currentNum) + '%'
+        global frenoDelanteroSP
+        global arduino
+        frenoDelanteroSP = str(currentNum)
+        arduinoString = "68 1 " + (frenoDelanteroSP)
+        print(arduinoString)
+        arduino.write(arduinoString.encode())
+
+
+    def subs_Diagnostico_FrenoDelantero(self):
+        currentStr = self.ids.frenoDelanteroSP.text
+        currentLst = currentStr.split('%')
+        currentNum = int(currentLst[0])
+        currentNum -= 1
+        if currentNum <= 0:
+            currentNum = 0
+        self.ids.frenoDelanteroSP.text = str(currentNum) + '%'
+        global arduino
+        global frenoDelanteroSP
+        frenoDelanteroSP = str(currentNum)
+        arduinoString = "68 1 " + (frenoDelanteroSP)
+        print(arduinoString)
+        arduino.write(arduinoString.encode())
+
+    def button_trenEnable(self):
+        global trenEnable
+        trenEnable = not trenEnable
+        if trenEnable:
+            self.ids['enableButton'].background_color = (0, 1, 0, 1)
+        else:
+            self.ids['enableButton'].background_color = (1, 0, 0, 1)
+        global arduino
+        global trenSP
+        global trenReversa
+        global trenLimVel1
+        global trenLimVel2
+        arduinoString = "84 5" + str(trenSP) + " " + ("1" if trenEnable else "0") + " " + ("1" if trenReversa else "0") + " " + ("1" if trenLimVel1 else "0") + " " + ("1" if trenLimVel2 else "0")
+        print(arduinoString)
+        arduino.write(arduinoString.encode())
+
+    def button_trenReversa(self):
+        global trenReversa
+        trenReversa = not trenReversa
+        if trenReversa:
+            self.ids['reversaButton'].background_color = (0, 1, 0, 1)
+        else:
+            self.ids['reversaButton'].background_color = (1, 0, 0, 1)
+        global arduino
+        global trenSP
+        global trenEnable
+        global trenLimVel1
+        global trenLimVel2
+        arduinoString = "84 5" + str(trenSP) + " " + ("1" if trenEnable else "0") + " " + ("1" if trenReversa else "0") + " " + ("1" if trenLimVel1 else "0") + " " + ("1" if trenLimVel2 else "0")        
+        print(arduinoString)
+        arduino.write(arduinoString.encode())
+
+    def button_trenLim1(self):
+        global trenLimVel1
+        trenLimVel1 = not trenLimVel1
+        if trenLimVel1:
+            self.ids['lim1Button'].background_color = (0, 1, 0, 1)
+        else:
+            self.ids['lim1Button'].background_color = (1, 0, 0, 1)
+        global arduino
+        global trenSP
+        global trenEnable
+        global trenReversa
+        global trenLimVel2
+        arduinoString = "84 5" + str(trenSP) + " " + ("1" if trenEnable else "0") + " " + ("1" if trenReversa else "0") + " " + ("1" if trenLimVel1 else "0") + " " + ("1" if trenLimVel2 else "0")        
+        print(arduinoString)
+        arduino.write(arduinoString.encode())
+
+    def button_trenLim2(self):
+        global trenLimVel2
+        trenLimVel2 = not trenLimVel2
+        if trenLimVel2:
+            self.ids['lim2Button'].background_color = (0, 1, 0, 1)
+        else:
+            self.ids['lim2Button'].background_color = (1, 0, 0, 1)
+        global arduino
+        global trenSP
+        global trenEnable
+        global trenReversa
+        global trenLimVel1
+        arduinoString = "84 5" + str(trenSP) + " " + ("1" if trenEnable else "0") + " " + ("1" if trenReversa else "0") + " " + ("1" if trenLimVel1 else "0") + " " + ("1" if trenLimVel2 else "0")        
+        print(arduinoString)
+        arduino.write(arduinoString.encode())
+
+    
+
+        # global arduino
+        # global frenoDelanteroSP
+        # frenoDelanteroSP = str(currentNum)
+        # arduinoString = "68 1 " + (frenoDelanteroSP)
+        # print(arduinoString)
+        # arduino.write(arduinoString.encode())
+        
+################################################################################
+#     def add_Diagnostico_Velocidad(self):
+#         currentStr = self.ids.diagnostico_referencia_velocidad.text
+#         currentLst = currentStr.split(' '+'km/h')
+#         currentNum = int(currentLst[0])
+#         currentNum += 1
+#         if currentNum >= 90:
+#             currentNum = 90
+#         self.ids.diagnostico_referencia_velocidad.text = str(currentNum)+' '+'km/h'
+#         global nuevo_diagnostico_referencia_velocidad_ValueStr
+#         nuevo_diagnostico_referencia_velocidad_ValueStr = str(currentNum)
+
+#     def subs_Diagnostico_Velocidad(self):
+#         currentStr = self.ids.diagnostico_referencia_velocidad.text
+#         currentLst = currentStr.split(' '+'km/h')
+#         currentNum = int(currentLst[0])
+#         currentNum -= 1
+#         if currentNum <= 0:
+#             currentNum = 0
+#         self.ids.diagnostico_referencia_velocidad.text = str(currentNum)+' '+'km/h'
+#         global nuevo_diagnostico_referencia_velocidad_ValueStr
+#         nuevo_diagnostico_referencia_velocidad_ValueStr = str(currentNum)
+# ################################################################################
+#     def add_Diagnostico_Frenos_Delanteros(self):
+#         currentStr = self.ids.diagnostico_referencia_frenos_delanteros.text
+#         currentLst = currentStr.split(' '+'%')
+#         currentNum = int(currentLst[0])
+#         currentNum += 1
+#         if currentNum >= 90:
+#             currentNum = 90
+#         self.ids.diagnostico_referencia_frenos_delanteros.text = str(currentNum)+' '+'%'
+#         global nuevo_diagnostico_referencia_frenos_delanteros_ValueStr
+#         nuevo_diagnostico_referencia_frenos_delanteros_ValueStr = str(currentNum)
+
+#     def subs_Diagnostico_Frenos_Delanteros(self):
+#         currentStr = self.ids.diagnostico_referencia_frenos_delanteros.text
+#         currentLst = currentStr.split(' '+'%')
+#         currentNum = int(currentLst[0])
+#         currentNum -= 1
+#         if currentNum <= 0:
+#             currentNum = 0
+#         self.ids.diagnostico_referencia_frenos_delanteros.text = str(currentNum)+' '+'%'
+#         global nuevo_diagnostico_referencia_frenos_delanteros_ValueStr
+#         nuevo_diagnostico_referencia_frenos_delanteros_ValueStr = str(currentNum)
+# ################################################################################
+#     def add_Diagnostico_Frenos_Traseros(self):
+#         currentStr = self.ids.diagnostico_referencia_frenos_traseros.text
+#         currentLst = currentStr.split(' '+'%')
+#         currentNum = int(currentLst[0])
+#         currentNum += 1
+#         if currentNum >= 90:
+#             currentNum = 90
+#         self.ids.diagnostico_referencia_frenos_traseros.text = str(currentNum)+' '+'%'
+#         global nuevo_diagnostico_referencia_frenos_traseros_ValueStr
+#         nuevo_diagnostico_referencia_frenos_traseros_ValueStr = str(currentNum)
+        
+#     def modoconduccion(self):
+#         self.driving=True
+        
+#     def subs_Diagnostico_Frenos_Traseros(self):
+#         currentStr = self.ids.diagnostico_referencia_frenos_traseros.text
+#         currentLst = currentStr.split(' '+'%')
+#         currentNum = int(currentLst[0])
+#         currentNum -= 1
+#         if currentNum <= 0:
+#             currentNum = 0
+#         self.ids.diagnostico_referencia_frenos_traseros.text = str(currentNum)+' '+'%'
+#         global nuevo_diagnostico_referencia_frenos_traseros_ValueStr
+#         nuevo_diagnostico_referencia_frenos_traseros_ValueStr = str(currentNum)
 ###############################################################################
 
     def update_Diagnostico_Referencia_Direccion(self):
         return nuevo_diagnostico_referencia_direccion_ValueStr
 
     def update_Diagnostico_Referencia_Velocidad(self):
-        return nuevo_diagnostico_referencia_velocidad_ValueStr
+        return trenValActual
 
     def update_Diagnostico_Referencia_Frenos_Delanteros(self):
         return nuevo_diagnostico_referencia_frenos_delanteros_ValueStr
@@ -166,6 +354,15 @@ class HawkingInterface(MDApp):
     tiempo = '          ' + tiempo
 
     #Variables enteras para el apartado REFERENCIA en DIAGNÓSTICO
+    trenSP = ObjectProperty(0)
+    trenValActual = ObjectProperty(0)
+    direccionSP = ObjectProperty(0)
+    direccionValActual = ObjectProperty(0)
+    frenoTraseroSP = ObjectProperty(0)
+    frenoTraseroValActual = ObjectProperty(0)
+    frenoDelanteroSP = ObjectProperty(0)
+    frenoDelanteroValActual = ObjectProperty(0)
+
     diagnostico_referencia_direccion_ValueInt = ObjectProperty(0)
     diagnostico_referencia_velocidad_ValueInt = ObjectProperty(0)
     diagnostico_referencia_frenos_delanteros_ValueInt = ObjectProperty(0)
@@ -187,6 +384,34 @@ class HawkingInterface(MDApp):
     def build(self):
         #REFERENCIA
         #DIRECCIÓN de la pantalla DIAGNÓSTICO
+        # TODO: regresar valores
+        global trenSP
+        trenSP = 3
+        global trenEnable
+        trenEnable = True
+        global trenReversa
+        trenReversa = False
+        global trenLimVel1
+        trenLimVel1 = False
+        global trenLimVel2
+        trenLimVel2 = False
+        global trenValActual
+        trenValActual = 0
+        global direccionSP
+        direccionSP = 0
+        global direccionValActual
+        direccionValActual = 10
+        global frenoTraseroSP
+        frenoTraseroSP = 0
+        global frenoTraseroValActual
+        frenoTraseroValActual = 0
+        global frenoDelanteroSP
+        frenoDelanteroSP = 0
+        global frenoDelanteroValActual
+        frenoDelanteroValActual = 0
+
+
+
         global diagnostico_referencia_direccion_ValueStr
         global nuevo_diagnostico_referencia_direccion_ValueStr
         diagnostico_referencia_direccion_ValueStr = '0'
@@ -214,9 +439,10 @@ class HawkingInterface(MDApp):
 ################################################################################
 
         self.theme_cls.primary_palette = "Indigo"
-
+        # TODO: regresar arduino
         try:
-            self.arduino = serial.Serial('/dev/ttyUSB0',115200, timeout = 0.5)
+            global arduino
+            arduino = serial.Serial('/dev/ttyUSB0',115200, timeout = 0.5)
         except:
             print('Sin comunicación.')
 
@@ -226,7 +452,8 @@ class HawkingInterface(MDApp):
 		#Todos los arrays de caracteres deben terminar en # para que arduino sepa que una línea completa ha sido recibida
         initValStr = '0 0 0 0 #'
 
-        self.arduino.write(initValStr.encode())
+        # TODO: regresar arduino
+        # self.arduino.write(initValStr.encode())
         print('Bus initialized')
 
         Clock.schedule_interval(self.update, 1)
@@ -349,14 +576,30 @@ ScreenManager:
         row_default_height:50
         cols:5
         MDLabel:
-        MDLabel:
-        MDLabel:
-        MDLabel:
         Button:
-            text: 'RESET'
+            text: 'Enable'
+            bold: True
+            id: enableButton
+            background_color: (0, 1, 0, 1)
+            on_release: root.button_trenEnable()
+        Button:
+            text: 'Reversa'
             bold: True
             background_color: (1,0,0,1)
-            on_release: root.Reset()
+            id: reversaButton
+            on_release: root.button_trenReversa()
+        Button:
+            text: 'Límite 1'
+            bold: True
+            id: lim1Button
+            background_color: (1,0,0,1)
+            on_release: root.button_trenLim1()
+        Button:
+            text: 'Límite 2'
+            bold: True
+            id: lim2Button
+            background_color: (1,0,0,1)
+            on_release: root.button_trenLim2()
 ################################################################################
         MDLabel:
             bold: True
@@ -384,7 +627,41 @@ ScreenManager:
             halign:'center'
 ################################################################################
         MDLabel:
-            text:'Dirección'
+            text:'Tren SP'
+            font_size: "20sp"
+            halign:'center'
+            pos_hint:{'center_y': 0.2}
+        Button:
+            text:"+"
+            font_size:"50sp"
+            halign:"right"
+            valign:"middle"
+            size: 30,30
+            background_color: (0,1,0,1)
+            on_release: root.add_Diagnostico_TrenMotrizSetPoint()
+        MDLabel:
+            id: trenSP
+            text: str(app.trenSP)
+            font_size: "20sp"
+            halign:'center'
+            pos_hint:{'center_y': 0.2}
+        Button:
+            text:"-"
+            font_size:"50sp"
+            halign:"right"
+            valign:"middle"
+            size: 30,30
+            background_color: (0,0,1,1)
+            on_release: root.subs_Diagnostico_TrenMotriz_SetPoint()
+        MDLabel:
+            id: trenValActual
+            text: str(app.trenValActual) + ' km/h'
+            font_size: "20sp"
+            halign:'center'
+            pos_hint:{'center_y': 0.2}
+################################################################################
+        MDLabel:
+            text:'Dirección SP'
             font_size: "20sp"
             halign:'center'
         Button:
@@ -396,8 +673,8 @@ ScreenManager:
             background_color: (0,1,0,1)
             on_release: root.add_Diagnostico_Direccion()
         MDLabel:
-            id: diagnostico_referencia_direccion
-            text: str(app.diagnostico_referencia_direccion_ValueInt)
+            id: direccionSP
+            text: str(app.direccionSP)
             font_size: "20sp"
             halign:'center'
             pos_hint:{'center_y': 0.2}
@@ -411,16 +688,16 @@ ScreenManager:
             on_release: root.subs_Diagnostico_Direccion()
         MDLabel:
             id: diagnostico_sensor_direccion
-            text: str(app.diagnostico_sensor_direccion_ValueInt)
+            text: str(app.direccionValActual)  + '°'
             font_size: "20sp"
             halign:'center'
             pos_hint:{'center_y': 0.2}
 ################################################################################
+
         MDLabel:
-            text:'Velocidad'
+            text:'Frenos Traseros SP'
             font_size: "20sp"
             halign:'center'
-            pos_hint:{'center_y': 0.2}
         Button:
             text:"+"
             font_size:"50sp"
@@ -428,10 +705,10 @@ ScreenManager:
             valign:"middle"
             size: 30,30
             background_color: (0,1,0,1)
-            on_release: root.add_Diagnostico_Velocidad()
+            on_release: root.add_Diagnostico_FrenoTrasero()
         MDLabel:
-            id: diagnostico_referencia_velocidad
-            text: str(app.diagnostico_referencia_velocidad_ValueInt)
+            id: frenoTraseroSP
+            text: str(app.frenoTraseroSP)
             font_size: "20sp"
             halign:'center'
             pos_hint:{'center_y': 0.2}
@@ -442,49 +719,16 @@ ScreenManager:
             valign:"middle"
             size: 30,30
             background_color: (0,0,1,1)
-            on_release: root.subs_Diagnostico_Velocidad()
+            on_release: root.subs_Diagnostico_FrenoTrasero()
         MDLabel:
-            id: diagnostico_sensor_velocidad
-            text: str(app.diagnostico_sensor_velocidad_ValueInt)
+            id: frenoTraseroValActual
+            text: str(app.frenoTraseroValActual) + '%'
             font_size: "20sp"
             halign:'center'
             pos_hint:{'center_y': 0.2}
 ################################################################################
         MDLabel:
-            text:'Frenos Delanteros'
-            font_size: "20sp"
-            halign:'center'
-        Button:
-            text:"+"
-            font_size:"50sp"
-            halign:"right"
-            valign:"middle"
-            size: 30,30
-            background_color: (0,1,0,1)
-            on_release: root.add_Diagnostico_Frenos_Delanteros()
-        MDLabel:
-            id: diagnostico_referencia_frenos_delanteros
-            text: str(app.diagnostico_referencia_frenos_delanteros_ValueInt)
-            font_size: "20sp"
-            halign:'center'
-            pos_hint:{'center_y': 0.2}
-        Button:
-            text:"-"
-            font_size:"50sp"
-            halign:"right"
-            valign:"middle"
-            size: 30,30
-            background_color: (0,0,1,1)
-            on_release: root.subs_Diagnostico_Frenos_Delanteros()
-        MDLabel:
-            id: diagnostico_sensor_frenos_delanteros
-            text: str(app.diagnostico_sensor_frenos_delanteros_ValueInt)
-            font_size: "20sp"
-            halign:'center'
-            pos_hint:{'center_y': 0.2}
-################################################################################
-        MDLabel:
-            text:'Frenos      Traseros'
+            text:'Frenos Delanteros SP'
             font_size: "20sp"
             halign:'center'
         Button:
@@ -494,10 +738,10 @@ ScreenManager:
             valign:"middle"
             size: 30,30
             background_color: (0,1,0,1)
-            on_release: root.add_Diagnostico_Frenos_Traseros()
+            on_release: root.add_Diagnostico_FrenoDelantero()
         MDLabel:
-            id: diagnostico_referencia_frenos_traseros
-            text: str(app.diagnostico_referencia_frenos_traseros_ValueInt)
+            id: frenoDelanteroSP
+            text: str(app.frenoDelanteroSP)
             font_size: "20sp"
             halign:'center'
         Button:
@@ -507,10 +751,10 @@ ScreenManager:
             valign:"middle"
             size: 30,30
             background_color: (0,0,1,1)
-            on_release: root.subs_Diagnostico_Frenos_Traseros()
+            on_release: root.subs_Diagnostico_FrenoDelantero()
         MDLabel:
-            id: diagnostico_sensor_frenos_traseros
-            text: str(app.diagnostico_sensor_frenos_traseros_ValueInt)
+            id: frenoDelanteroValActual
+            text: str(app.frenoDelanteroValActual)  + '%'
             font_size: "20sp"
             halign:'center'
 
@@ -623,20 +867,23 @@ ScreenManager:
 
         #Inicio de conteo de tiempo
         start = time.time()
+        # TODO: regresar arduino
 
-        arduino = self.arduino
+        # arduino = self.arduino
 
+
+        # TODO: checar si es necesario lo siguiente
         #Pasa los estados modificados a la pantalla de Diagnóstico
-        classObj = Diagnostico()
-
+        # classObj = Diagnostico()
         #Actualización de variables de Referencia
-        diagnostico_referencia_direccion_ValueStr = classObj.update_Diagnostico_Referencia_Direccion()
-        diagnostico_referencia_velocidad_ValueStr = classObj.update_Diagnostico_Referencia_Velocidad()
-        diagnostico_referencia_frenos_delanteros_ValueStr = classObj.update_Diagnostico_Referencia_Frenos_Delanteros()
-        diagnostico_referencia_frenos_traseros_ValueStr = classObj.update_Diagnostico_Referencia_Frenos_Traseros()
+        # diagnostico_referencia_direccion_ValueStr = classObj.update_Diagnostico_Referencia_Direccion()
+        # diagnostico_referencia_velocidad_ValueStr = classObj.update_Diagnostico_Referencia_Velocidad()
+        # diagnostico_referencia_frenos_delanteros_ValueStr = classObj.update_Diagnostico_Referencia_Frenos_Delanteros()
+        # diagnostico_referencia_frenos_traseros_ValueStr = classObj.update_Diagnostico_Referencia_Frenos_Traseros()
 
         #Buffer a enviar
-        Valores_Actuales_Str = diagnostico_referencia_direccion_ValueStr + ' ' +  diagnostico_referencia_velocidad_ValueStr + ' ' +  diagnostico_referencia_frenos_delanteros_ValueStr + ' ' +  diagnostico_referencia_frenos_traseros_ValueStr + ' ' + '#'
+        Valores_Actuales_Str = str(trenSP) + ' ' + str(trenEnable) + ' ' + str(trenReversa) + ' ' + str(trenLimVel1) + ' ' + str(trenLimVel2) + ' ' + str(trenValActual) + ' ' + str(direccionSP)+ ' ' + str(direccionValActual)+ ' ' + str(frenoTraseroSP) + ' ' + str(frenoTraseroValActual) + ' ' + str(frenoDelanteroSP) + ' ' + str(frenoDelanteroValActual) 
+         # diagnostico_referencia_direccion_ValueStr + ' ' +  diagnostico_referencia_velocidad_ValueStr + ' ' +  diagnostico_referencia_frenos_delanteros_ValueStr + ' ' +  diagnostico_referencia_frenos_traseros_ValueStr + ' ' + '#'
 
         #Convierte a Lista el String
         Valores_Actuales_Lst = Valores_Actuales_Str.split()
@@ -645,33 +892,89 @@ ScreenManager:
         print('                                                     ')
         #print('Envío de valores:',Valores_Actuales_Lst)
 
-        try:
-            print(Valores_Actuales_Str)                                         #Este se envía a Arduino
-        except:
-            print('AYUDA!')
+        # try:
+        #     # print(Valores_Actuales_Str)                                         #Este se envía a Arduino
+        # except:
+        #     print('AYUDA!')
 
         #Actualización de valores en REFERENCIA de la pantalla DIAGNÓSTICO en la INTERFAZ
-        self.diagnostico_referencia_direccion_ValueInt = (Valores_Actuales_Lst[0]) + '°'
-        self.diagnostico_referencia_velocidad_ValueInt = (Valores_Actuales_Lst[1]) +' '+'km/h'
-        self.diagnostico_referencia_frenos_delanteros_ValueInt = (Valores_Actuales_Lst[2]) +' '+ '%'
-        self.diagnostico_referencia_frenos_traseros_ValueInt = (Valores_Actuales_Lst[3]) +' '+ '%'
+        # self.diagnostico_referencia_velocidad_ValueInt = (Valores_Actuales_Lst[1]) +' '+'km/h'
+        self.trenSP = (Valores_Actuales_Lst[0])+' '+'km/h'
+        # self.trenValActual = (Valores_Actuales_Lst[5])+' '+'km/h'
+        self.direccionSP = (Valores_Actuales_Lst[6]) + '°'
+        # self.direccionValActual = (Valores_Actuales_Lst[7]) + '°'
+        self.frenoTraseroSP = (Valores_Actuales_Lst[8]) + '%'
+        # self.frenoTraseroValActual = (Valores_Actuales_Lst[9]) + '%'
+        self.frenoDelanteroSP = (Valores_Actuales_Lst[10]) + '%'
+        # self.frenoDelanteroValActual = (Valores_Actuales_Lst[11]) + '%'
 
         #Buffer y eco a arduino
-        arduino.write(Valores_Actuales_Str.encode())
+        # TODO: regresar arduino
+        # self.arduino.write(Valores_Actuales_Str.encode())
 
     def recibo(self,*args):
 
             #Recepción y Almacenamiento de Datos
-            Lectura_Str = self.arduino.read(size=200).decode()
+            TODO: regresar arduino
+            global arduino
+            # Lectura_Str = arduino.read(size=200).decode()
 
             #print('Recibimiento de valores:',Lectura_Str)
-            Lectura_Lst = Lectura_Str.split()
-            #print(Lectura_Lst)
-            lectura_l=Lectura_Str.split("%")
-            print(self.driving)
+            # Lectura_Str = "84 5 8 False False False False 56"
+            lectura_l = Lectura_Str.split()
+            # print(lectura_l)
+            # lectura_l=Lectura_Str.split("%")
+            classObj = Diagnostico()
+
+            #Actualización de variables de Referencia
+            diagnostico_referencia_direccion_ValueStr = classObj.update_Diagnostico_Referencia_Direccion()
+            diagnostico_referencia_velocidad_ValueStr = classObj.update_Diagnostico_Referencia_Velocidad()
+            diagnostico_referencia_frenos_delanteros_ValueStr = classObj.update_Diagnostico_Referencia_Frenos_Delanteros()
+            diagnostico_referencia_frenos_traseros_ValueStr = classObj.update_Diagnostico_Referencia_Frenos_Traseros()
+
+            # TODO: regresar arduino
+            # TODO: actualizar a que se editen valores actuales 
+            # self.trenSP = 
             try:
-                
-                print(lectura_l[1])
+                if lectura_l[0] == "84":
+                    self.trenEnable = lectura_l[3]
+                    self.trenReversa = lectura_l[4]
+                    self.trenLimVel1 = lectura_l[5]
+                    self.trenLimVel2 = lectura_l[6]
+                    self.trenValActual = lectura_l[7]
+                #     print(trenSP)
+                #     # self.diagnostico_sensor_direccion_ValueInt = lectura_l[3] 
+                #     # self.diagnostico_referencia_velocidad = lectura_l[4]
+                #     # self.diagnostico_referencia_frenos_delanteros_ValueInt = lectura_l[5]
+                #     #Valores_Actuales_Str = self.diagnostico_sensor_direccion_ValueInt + ' ' lectura_l[4] + ' ' lectura_l[5] + '#'
+                if lectura_l[0] == "116":
+                    self.trenValActual = lectura_l[2]
+
+                # if lectura_l[0] == "83":
+                #     self.direccionSP = lectura_l[2]
+
+                if lectura_l[0] == "115":
+                    self.direccionValActual = lectura_l[2]
+
+                # if lectura_l[0] == "66":
+                #     self.frenoTraseroSP = lectura_l[2]
+
+                if lectura_l[0] == "98":
+                    self.frenoTraseroValActual = lectura_l[2]
+
+                # if lectura_l[0] == "68":
+                #     self.frenoDelanteroSP = lectura_l[2]
+
+                if lectura_l[0] == "100":
+                    self.frenoDelanteroValActual = lectura_l[2]
+
+
+
+
+
+                print(self.driving)
+            
+                 # + self.frenoDelanteroValActual +self.frenoTraseroValActual)
                 Lectura_post=str(lectura_l[1]).split()
                 self.diagnostico_sensor_direccion_ValueInt = Lectura_post[0]+'°'
                 self.diagnostico_sensor_velocidad_ValueInt = Lectura_post[1]+' '+'km/h'
